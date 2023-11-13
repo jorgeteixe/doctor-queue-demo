@@ -49,7 +49,7 @@
 		<ul>
 			{#each data.calls as call, index}
 				<div
-					class="flex justify-around mb-4 {index === 0 ? 'blink-animation' : ''} {index % 2 === 0
+					class="flex justify-around mb-4 {call.arrived ? '' : 'blink-animation'} {index % 2 === 0
 						? 'bg-gray-200'
 						: 'bg-white'}"
 				>
