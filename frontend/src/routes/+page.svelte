@@ -6,21 +6,13 @@
 	const submitId = async () => {
 		if (!idNumber) return;
 
-		// const response = await fetch('/api/submit-id', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	},
-		// 	body: JSON.stringify({ idNumber })
-		// });
-
-		const response = {
-			ok: true,
-			json: () =>
-				new Promise((resolve) => {
-					setTimeout(resolve({ code: 'HG24', name: 'Jorge Teixeira', door: '3' }), 500);
-				})
-		};
+		const response = await fetch('http://localhost:3000/appointments', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ idNumber })
+		});
 
 		if (response.ok) {
 			appointment = await response.json();

@@ -6,38 +6,38 @@
 	let showModal = false;
 	let selectedAppointment = null;
 
-	const callNext = () => {
+	const callNext = async () => {
 		selectedAppointment = data.appointments[0];
+		await fetch('http://localhost:3000/calls', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ code: selectedAppointment.code })
+		});
 		showModal = true;
 	};
 
-	const call = (appointment) => {
+	const call = async (appointment) => {
 		selectedAppointment = appointment;
+		await fetch('http://localhost:3000/calls', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ code: selectedAppointment.code })
+		});
 		showModal = true;
 	};
 
 	const remind = async () => {
-		// Replace with your actual API endpoint
-		// const response = await fetch('/api/remind', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	},
-		// 	body: JSON.stringify({ id: selectedAppointment.id })
-		// });
+		await fetch(`http://localhost:3000/calls/${selectedAppointment.code}/remind`, { method: 'POST' });
 	};
 
 	const arrived = async () => {
-		// Replace with your actual API endpoint
-		// const response = await fetch('/api/arrived', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	},
-		// 	body: JSON.stringify({ id: selectedAppointment.id })
-		// });
-		data.appointments = data.appointments.filter((a) => a.id !== selectedAppointment.id);
 		showModal = false;
+		data.appointments = data.appointments.filter((a) => a.code !== selectedAppointment.code);
+		await fetch(`http://localhost:3000/calls/${selectedAppointment.code}/arrived`, { method: 'POST' });
 	};
 
 	onMount(() => {
@@ -57,7 +57,7 @@
 		{#each data.appointments as appointment}
 			<li class="mb-4 p-4 bg-white rounded shadow-sm flex justify-between items-center">
 				<div>
-					<p class="font-bold">{appointment.id} - {appointment.name}</p>
+					<p class="font-bold">{appointment.code} - {appointment.name}</p>
 					<p>{appointment.type}</p>
 				</div>
 				<button
@@ -74,7 +74,7 @@
 {#if showModal && selectedAppointment}
 	<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
 		<div class="bg-white p-4 rounded-lg shadow-lg max-w-xs w-full">
-			<div class="text-center font-bold text-lg mb-4">{selectedAppointment.id}</div>
+			<div class="text-center font-bold text-lg mb-4">{selectedAppointment.code}</div>
 			<div class="text-center text-3xl font-bold mb-4">{selectedAppointment.type}</div>
 			<hr class="my-5" />
 			<div class="mb-2"><strong>Name: </strong>{selectedAppointment.name}</div>

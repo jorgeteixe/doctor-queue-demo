@@ -26,8 +26,8 @@
 
 <div class="flex flex-row h-screen w-full">
 	<div class="flex flex-col justify-around bg-gray-200 w-1/2 h-full py-10">
-		<div class="m-5 text-5xl text-center">
-			<span class="h-10 w-10 rounded-full bg-blue-500 inline-block mx-1" />Blue room
+		<div class="m-5 text-7xl text-center">
+			<span class="h-16 w-16 rounded-full bg-blue-500 inline-block mx-1" />Blue room
 		</div>
 		<div class="text-9xl text-center font-bold">{currentTime}</div>
 		<div class="aspect-w-16 aspect-h-9 w-full" style="position:relative;padding-top:56.25%;">
@@ -42,18 +42,18 @@
 	</div>
 	<div class="w-1/2 p-4 h-screen overflow-hidden">
 		<div class="flex justify-around">
-			<h2 class="text-4xl font-bold">Calls</h2>
+			<h2 class="text-4xl font-bold">Code</h2>
 			<h2 class="text-4xl font-bold">Door</h2>
 		</div>
 		<hr class="my-2" />
 		<ul>
-			{#each data.calls as call, index}
+			{#each data.calls.reverse() as call, index}
 				<div
-					class="flex justify-around mb-4 {call.arrived ? '' : 'blink-animation'} {index % 2 === 0
+					class="flex justify-around font-mono mb-4 {call.arrived ? '' : 'blink-animation'} {index % 2 === 0
 						? 'bg-gray-200'
 						: 'bg-white'}"
 				>
-					<h2 class="text-8xl font-bold">{call.id}</h2>
+					<h2 class="text-8xl font-bold">{call.code}</h2>
 					<h2 class="text-8xl">{call.door}</h2>
 				</div>
 			{/each}
@@ -68,7 +68,7 @@
 			background-color: transparent;
 		}
 		50% {
-			background-color: #ffcc00; /* light orange color */
+			background-color: #ffcc00;
 		}
 	}
 	.blink-animation {
