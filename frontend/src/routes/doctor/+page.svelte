@@ -1,5 +1,7 @@
 <script>
+	import { PUBLIC_BASE_URL, PUBLIC_BASE_URL_SOCKET } from '$env/static/public';
 	import { onMount } from 'svelte';
+	import { io } from 'socket.io-client';
 
 	export let data;
 
@@ -8,7 +10,7 @@
 
 	const callNext = async () => {
 		selectedAppointment = data.appointments[0];
-		await fetch('http://localhost:3000/calls', {
+		await fetch(`${PUBLIC_BASE_URL}/calls`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -20,7 +22,7 @@
 
 	const call = async (appointment) => {
 		selectedAppointment = appointment;
-		await fetch('http://localhost:3000/calls', {
+		await fetch(`${PUBLIC_BASE_URL}/calls`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -31,17 +33,32 @@
 	};
 
 	const remind = async () => {
-		await fetch(`http://localhost:3000/calls/${selectedAppointment.code}/remind`, { method: 'POST' });
+		await fetch(`${PUBLIC_BASE_URL}/calls/${selectedAppointment.code}/remind`, { method: 'POST' });
 	};
 
 	const arrived = async () => {
 		showModal = false;
 		data.appointments = data.appointments.filter((a) => a.code !== selectedAppointment.code);
-		await fetch(`http://localhost:3000/calls/${selectedAppointment.code}/arrived`, { method: 'POST' });
+		await fetch(`${PUBLIC_BASE_URL}/calls/${selectedAppointment.code}/arrived`, { method: 'POST' });
 	};
 
 	onMount(() => {
-		// Initialization logic if needed
+		// Initialize Socket.IO client
+		const socket = io(PUBLIC_BASE_URL_SOCKET);
+
+		socket.on('connect', () => {
+			console.log('Connected to the server');
+		});
+
+		socket.on('appointment', (appointment) => {
+			console.log('Appointment: ', appointment);
+			data.appointments = [...data.appointments, appointment];
+		});
+
+		// Handle cleanup
+		return () => {
+			socket.disconnect();
+		};
 	});
 </script>
 
@@ -78,18 +95,12 @@
 			<div class="text-center text-3xl font-bold mb-4">{selectedAppointment.type}</div>
 			<hr class="my-5" />
 			<div class="mb-2"><strong>Name: </strong>{selectedAppointment.name}</div>
-			<div class="flex justify-between">
+			<div class="flex justify-center">
 				<button
 					class="bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
 					on:click={arrived}
 				>
 					Arrived
-				</button>
-				<button
-					class="bg-yellow-500 text-white p-2 rounded-md hover:bg-yellow-600"
-					on:click={remind}
-				>
-					Remind
 				</button>
 			</div>
 		</div>

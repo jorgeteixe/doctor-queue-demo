@@ -1,4 +1,6 @@
 <script>
+	import { PUBLIC_BASE_URL } from '$env/static/public';
+	
 	let idNumber = '';
 	let showModal = false;
 	let appointment = null;
@@ -6,7 +8,7 @@
 	const submitId = async () => {
 		if (!idNumber) return;
 
-		const response = await fetch('http://localhost:3000/appointments', {
+		const response = await fetch(`${PUBLIC_BASE_URL}/appointments`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'

@@ -1,8 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
+	import { io } from 'socket.io-client';
+	import { PUBLIC_BASE_URL_SOCKET } from '$env/static/public';
 	export let data;
 
-	let currentTime = new Date().toLocaleTimeString([], {
+	let currentTime = new Date().toLocaleTimeString(['es'], {
 		hour: '2-digit',
 		minute: '2-digit',
 		second: '2-digit'
@@ -11,16 +13,37 @@
 	// Update the current time every minute
 	onMount(() => {
 		const interval = setInterval(() => {
-			currentTime = new Date().toLocaleTimeString([], {
+			currentTime = new Date().toLocaleTimeString(['es'], {
 				hour: '2-digit',
 				minute: '2-digit',
 				second: '2-digit'
 			});
 		}, 1000);
 
+		// Initialize Socket.IO client
+		const socket = io(PUBLIC_BASE_URL_SOCKET);
+
+		socket.on('connect', () => {
+			console.log('Connected to the server');
+		});
+
+		socket.on('call', (call) => {
+			console.log('Call: ', call);
+			data.calls = [call, ...data.calls];
+		});
+
+		socket.on('arrived', (arrived) => {
+			console.log('Arrived: ', arrived);
+			data.calls.find((v) => v.code === arrived).arrived = true;
+			data.calls = data.calls;
+		});
+
+		// Handle cleanup
 		return () => {
 			clearInterval(interval);
+			socket.disconnect();
 		};
+
 	});
 </script>
 
@@ -47,7 +70,7 @@
 		</div>
 		<hr class="my-2" />
 		<ul>
-			{#each data.calls.reverse() as call, index}
+			{#each data.calls as call, index}
 				<div
 					class="flex justify-around font-mono mb-4 {call.arrived ? '' : 'blink-animation'} {index % 2 === 0
 						? 'bg-gray-200'
